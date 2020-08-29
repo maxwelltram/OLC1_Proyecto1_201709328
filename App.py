@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox as MessageBox
 import tkinter as tk
+from tkinter.font import Font
 from tkinter.filedialog import askopenfilename
 from tkinter import simpledialog
 root = tk.Tk()
@@ -55,8 +56,7 @@ class CustomText(tk.Text):
         self._orig = self._w + "_orig"
         self.tk.call("rename", self._w, self._orig)
         self.tk.createcommand(self._w, self._proxy)
-    
-    
+
 
     def _proxy(self, *args):
         
@@ -99,8 +99,6 @@ class CustomTextt(tk.Text):
 
          
         return result
-
-#PROBANDO EL BOTON*************************************************
 
 
 
@@ -162,6 +160,7 @@ class Example(tk.Frame):
         Tk().withdraw()
         filename = askopenfilename(filetypes=[("Html file","*.html"),("JavaScript file","*.js"),("Css file","*.css")])
         fichero = open(filename,"r")
+        print(filename)
         contenido = fichero.read()
         self.text.delete(1.0,"end")
         self.text.insert("insert",contenido)
@@ -191,7 +190,7 @@ class Example(tk.Frame):
         self.linenumberss.redraw()
 
 if __name__ == "__main__":
-    jalando=Example()
     Example(root).pack(side="top", fill="both")
+
     root.resizable(width=False,height=False)
     root.mainloop()
