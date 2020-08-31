@@ -1,10 +1,13 @@
 from tkinter import *
 from tkinter import messagebox as MessageBox
 import tkinter as tk
+import AnalizadorHTML as anaHtml
 from tkinter.font import Font
 from tkinter.filedialog import askopenfilename
 from tkinter import simpledialog
 root = tk.Tk()
+
+Analiza=""  
 #PROBANDO LOS CONTADORES DE LINEAS*************************************************
 class TextLineNumbers(tk.Canvas):
     def __init__(self, *args, **kwargs):
@@ -168,7 +171,8 @@ class Example(tk.Frame):
     def obten(self):    
         input = self.text.get("1.0","end-1c")
         print(input)
-        MessageBox.showinfo("Hola!", input)
+        Errores, TextoLimpio = anaHtml.inicio(input)
+        self.textt.insert("insert",Errores)
     def GuardarComo(self):
         nombre = simpledialog.askstring("Guardar Como", "Escriba el nombre del archivo con su extension",
                                 parent=root)
