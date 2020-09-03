@@ -172,7 +172,20 @@ class Example(tk.Frame):
         input = self.text.get("1.0","end-1c")
         print(input)
         Errores, TextoLimpio = anaHtml.inicio(input)
-        self.textt.insert("insert",Errores)
+        if Errores!="" and TextoLimpio!="":
+            MessageBox.showinfo("ANALISIS EXITOSO","SE ACTUALIZO EL ARCHIVO Y SE MUESTRAN LOS ERRORES")
+            self.text.delete(1.0,"end")
+            self.text.insert("insert",TextoLimpio)
+            self.textt.delete(1.0,"end")
+            self.textt.insert("insert",Errores)
+        elif TextoLimpio!="":
+            MessageBox.showinfo("ANALISIS EXITOSO","NO SE ENCONTRARON ERRORES")
+            self.text.delete(1.0,"end")
+            self.text.insert("insert",TextoLimpio)
+            self.textt.delete(1.0,"end")
+        else:
+            MessageBox.showinfo("ANALISIS FALLIDO","NO SE PUDO REALIZAR EL ANALISIS")
+        
     def GuardarComo(self):
         nombre = simpledialog.askstring("Guardar Como", "Escriba el nombre del archivo con su extension",
                                 parent=root)
@@ -189,9 +202,11 @@ class Example(tk.Frame):
         print(input)
         archivo.write(input)
         archivo.close()
+
     def _on_change(self, event):
         self.linenumbers.redraw()
         self.linenumberss.redraw()
+
 
 if __name__ == "__main__":
     Example(root).pack(side="top", fill="both")
