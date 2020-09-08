@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import messagebox as MessageBox
 import tkinter as tk
 import AnalizadorHTML as anaHtml
+import AnalizadorCSS as anaCss
 from tkinter.font import Font
 from tkinter.filedialog import askopenfilename
 from tkinter import simpledialog
@@ -164,6 +165,7 @@ class Example(tk.Frame):
         filename = askopenfilename(filetypes=[("Html file","*.html"),("JavaScript file","*.js"),("Css file","*.css")])
         fichero = open(filename,"r")
         print(filename)
+        
         contenido = fichero.read()
         self.text.delete(1.0,"end")
         self.text.insert("insert",contenido)
@@ -171,7 +173,9 @@ class Example(tk.Frame):
     def obten(self):    
         input = self.text.get("1.0","end-1c")
         print(input)
-        Errores, TextoLimpio = anaHtml.inicio(input)
+        anaCss.inicio(input)
+        ##Errores, TextoLimpio = anaHtml.inicio(input)
+        """
         if Errores!="" and TextoLimpio!="":
             MessageBox.showinfo("ANALISIS EXITOSO","SE ACTUALIZO EL ARCHIVO Y SE MUESTRAN LOS ERRORES")
             self.text.delete(1.0,"end")
@@ -185,6 +189,7 @@ class Example(tk.Frame):
             self.textt.delete(1.0,"end")
         else:
             MessageBox.showinfo("ANALISIS FALLIDO","NO SE PUDO REALIZAR EL ANALISIS")
+        """
         
     def GuardarComo(self):
         nombre = simpledialog.askstring("Guardar Como", "Escriba el nombre del archivo con su extension",

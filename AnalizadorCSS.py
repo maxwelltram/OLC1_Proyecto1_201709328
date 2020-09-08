@@ -1,4 +1,4 @@
-import re
+import re,os
 
 linea =0
 columna=0
@@ -13,7 +13,7 @@ reservadas = ['color','font-size','background-color','margin-top','margin-bottom
 ,'min-height','solid','rgba','url']
 
 signos = {"DOS_PUNTOS":':', "PORCENTAJE":'%', "NUMERAL":'#', "COMILLASD":'"',"COMILLAS_SIM":'\'',"PUNTO_Y_COMA":';',"LLAVE_IZQ":'{',
-"LLAVE_DER":'}',"MENOR_QUE":'<',"MAYOR_QUE":'>',"ASTERISCO":'*',"DIAGONAL":'/'}
+"LLAVE_DER":'}',"MENOR_QUE":'<',"MAYOR_QUE":'>',"ASTERISCO":'*',"DIAGONAL":'/',"NUMERAL":'#'}
 
 def inic(text):
     global linea, columna, contador, Errores, texto, TextoError
@@ -22,10 +22,11 @@ def inic(text):
     listaTokens = []
 
     while contador < len(text):
-        if re.search(r"[A-Za-z]", text[contador]): #IDENTIFICADOR
+        if re.search(r"[\/]",text[contador]):
+            listaTokens.append(Comments(linea, columna, text, text[contador]))
+        #elif re.search(r"[0-9]", text[contador]): #NUMERO
+        elif re.search(r"[\-a-zA-z]",text[contador]):
             listaTokens.append(StateIdentifier(linea, columna, text, text[contador]))
-        elif re.search(r"[0-9]", text[contador]): #NUMERO
-            listaTokens.append(StateNumber(linea, columna, text, text[contador]))
         elif re.search(r"[\n]", text[contador]):#SALTO DE LINEA
             contador += 1
             linea += 1
@@ -42,10 +43,10 @@ def inic(text):
         else:
             #SIGNOS
             isSign = False
-            texto= texto+""+text[contador]
             for clave in signos:
                 valor = signos[clave]
-                if re.fullmatch(valor, text[contador]):
+                if re.search(valor, text[contador]):
+                    texto= texto+""+text[contador]
                     listaTokens.append([linea, columna, clave, valor.replace('\\','')])
                     contador += 1
                     columna += 1
@@ -58,17 +59,50 @@ def inic(text):
                 contador += 1
     return listaTokens
 
-def StateIdentifier(line, column, text, word):
-    global contador, columna,texto
-    contador += 1
-    columna += 1
+def StateIdentifier(line,column,text,word):
+    global contador, columna, texto
+    contador+=1
+    columna+=1
     if contador < len(text):
-        if re.search(r"[a-zA-Z_0-9]", text[contador]):#IDENTIFICADOR
-            return StateIdentifier(line, column, text, word + text[contador])
+        if re.search(r"[a-zA-Z_0-9\-]", text[contador]):
+            return StateIdentifier(line,column,text, word + text[contador])
         else:
+            return [line,column,'IDENTIFICADOR', word]
+    else:
+        return[line, column,'IDENTIFICADOR',word]
+
+def Comments(line,column, text, word):
+    global contador, columna, texto
+    contador+=1
+    columna+=1
+    if contador < len(text):
+        if re.search(r"[\*]",text[contador]):
+            return Comments(line, column, text, word+ text[contador])
+        elif re.search(r"[a-zA-Z0-9\s\&\%\$\#\"\!\(\)\=\'\?\¿\¡\-\<\>\_\|\°\¬\{\}\.\,\~\+\;\:\¨\`\^\@\[\]]",text[contador]):
+            return Comments(line, column, text, word + text[contador])
+        elif re.search(r"[\/]",text[contador]):
             texto= texto+""+word
-            return [line, column, 'identificador', word]
-            #agregar automata de identificador en el arbol, con el valor
+            return [line, column, 'COMENTARIO', word]
+        else:
+            texto = texto+""+word
+            return [line,column, 'COMENTARIO', word]
     else:
         texto= texto+""+word
-        return [line, column, 'identificador', word]
+        return [line,column,'COMENTARIO', word]
+
+def Reserved(TokenList):
+    global texto
+    for token in TokenList:
+        if token[2] == 'IDENTIFICADOR':
+            for reservada in reservadas:
+                palabra = r"^" + reservada + "$"
+                if re.match(palabra, token[3], re.IGNORECASE):
+                    token[2] = 'PALABRA_RESERVADA'
+                    break
+
+def inicio(datos):
+    textos = datos
+    tokens = inic(textos)
+    Reserved(tokens)
+    for token in tokens:
+        print(token)

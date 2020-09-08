@@ -11,7 +11,7 @@ Errores = []
 reservadas = ['html','head','title','img','body','src', 'p', 'a href','ul','p style','table','th','tr','td','style','caption','colgroup'
 ,'col','thead','tbody','tfoot','caption','style','width','auto','height']
 
-signos = {"MENOR QUE":'<', "MAYOR QUE":'>', "DIAGONAL":'/', "COMILLASD":'"',"PUNTO":'\.',"PORCENTAJE":'%',"PUNTO_Y_COMA":';'}
+signos = {"MENOR QUE":'<', "MAYOR QUE":'>', "DIAGONAL":'/', "COMILLASD":'"',"PUNTO":'\.',"PUNTO_Y_COMA":';',"DOS_PUNTOS":':',"SIGNO_IGUAL":'=',"NUMERAL":'#'}
 
 
 def inic(text):
