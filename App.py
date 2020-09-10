@@ -163,7 +163,7 @@ class Example(tk.Frame):
     def Abrir(self):
         Tk().withdraw()
         filename = askopenfilename(filetypes=[("Html file","*.html"),("JavaScript file","*.js"),("Css file","*.css")])
-        fichero = open(filename,"r")
+        fichero = open(filename,"r", encoding='utf-8')
         print(filename)
         
         contenido = fichero.read()
@@ -173,9 +173,10 @@ class Example(tk.Frame):
     def obten(self):    
         input = self.text.get("1.0","end-1c")
         print(input)
-        anaCss.inicio(input)
+        Errores, TextoLimpio = anaCss.inicio(input)
+
         ##Errores, TextoLimpio = anaHtml.inicio(input)
-        """
+        
         if Errores!="" and TextoLimpio!="":
             MessageBox.showinfo("ANALISIS EXITOSO","SE ACTUALIZO EL ARCHIVO Y SE MUESTRAN LOS ERRORES")
             self.text.delete(1.0,"end")
@@ -189,7 +190,7 @@ class Example(tk.Frame):
             self.textt.delete(1.0,"end")
         else:
             MessageBox.showinfo("ANALISIS FALLIDO","NO SE PUDO REALIZAR EL ANALISIS")
-        """
+        
         
     def GuardarComo(self):
         nombre = simpledialog.askstring("Guardar Como", "Escriba el nombre del archivo con su extension",

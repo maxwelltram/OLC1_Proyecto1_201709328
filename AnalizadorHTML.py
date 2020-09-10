@@ -155,7 +155,7 @@ def Reserved(TokenList):
                     break
 def GeneraReporte(direccion):
 
-    nombre=direccion+"\\"+"Errores.html"
+    nombre=direccion+"\\"+"ErroresHTML.html"
     archivo = open(nombre,"w+")
     archivo.write("<!DOCTYPE HTML5>\n<html>\n<head>\n<title>TABLA DE ERRORES</title>\n</head>\n<body>\n")
     archivo.write("\n<table border=\"1\">")
