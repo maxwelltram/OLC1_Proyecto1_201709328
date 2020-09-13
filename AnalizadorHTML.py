@@ -168,6 +168,7 @@ def GeneraReporte(direccion):
         archivo.write("</tr>\n")
     archivo.write("</table>\n</body>\n</html>")
     archivo.close()
+    os.system(nombre)
 
 def inicio(datos):
     global TextoError,texto,path

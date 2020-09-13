@@ -1,8 +1,9 @@
-from tkinter import *
+from tkinter import *   
 from tkinter import messagebox as MessageBox
 import tkinter as tk
 import AnalizadorHTML as anaHtml
 import AnalizadorCSS as anaCss
+import AnalizadorJSS as anaJss
 from tkinter.font import Font
 from tkinter.filedialog import askopenfilename
 from tkinter import simpledialog
@@ -173,6 +174,9 @@ class Example(tk.Frame):
     def obten(self):    
         input = self.text.get("1.0","end-1c")
         print(input)
+
+        ##Errores, TextoLimpio = anaJss.inicio(input)
+
         Errores, TextoLimpio = anaCss.inicio(input)
 
         ##Errores, TextoLimpio = anaHtml.inicio(input)

@@ -8,16 +8,15 @@ path=""
 TextoError=""
 Errores = []
 
-reservadas = ['color','font-size','background-color','margin-top','margin-bottom','text-align', 'position', 'top','width','height','border','background-image'
-,'Opacity','background','font-family','font-style','font-weight','font-size','font','padding-left','padding-right','padding-bottom','padding-top','padding',
-'display','line-height','margin-right','margin-left','margin','border-style','bottom','right','left','float','clear','max-width','min-width','max-height'
-,'min-height','solid','rgba','url']
+reservadas =['var','string','int','char','boolean','if','if else','else','console.log','for','while','do','continue',
+'break','true','false','return','function','constructor','class','this','Math.pow']
 
-signos = {"DOS_PUNTOS":':', "PORCENTAJE":'%', "NUMERAL":'#',"COMILLAS_SIM":'\'',"PUNTO_Y_COMA":';',"LLAVE_IZQ":'{',
-"LLAVE_DER":'}',"DIAGONAL":'/',"COMA":'\,',"PUNTO":'\.',"PARENTESIS_I":'\(',"PARENTESIS_D":'\)',"ASTERISCO":'\*'}
+signos = {"DOS_PUNTOS":':',"COMILLAS_SIM":'\'',"PUNTO_Y_COMA":';',"LLAVE_IZQ":'{',"PARENTESIS_I":'\(',"PARENTESIS_D":'\)',
+"LLAVE_DER":'}',"SIGNO_IGUAL":'=',"ASTERISCO":'\*',"MENOR_QUE":'<',"MAYOR_QUE":'>',"MAS":'\+',"MENOS":'-',"COMILLAS_DOBLES":'\"',
+"ADMIRACION":'!',"PUNTO":'\.',"AND":'\&\&', "OR":'\|\|',"DIAGONAL":'/',"COMA":'\,'}
 
 def inic(text):
-    global linea, columna, contador, Errores, texto, TextoError
+    global linea, contador, texto, columna, Errores, TextoError
     linea = 1
     columna = 1
     listaTokens = []
@@ -25,19 +24,19 @@ def inic(text):
     while contador < len(text):
         if re.search(r"[\/]",text[contador]) and text[contador+1]=="/" :
             listaTokens.append(EstadoPath(linea, columna, text, text[contador]))
-        elif re.search(r"[\/]",text[contador]):
-            listaTokens.append(Comments(linea,columna, text, text[contador]))
-        elif re.search(r"[\-a-zA-Z]",text[contador],re.UNICODE):
-            listaTokens.append(StateIdentifier(linea, columna, text, text[contador]))
-        elif re.search(r"[0-9]",text[contador]):
-            listaTokens.append(StateNumber(linea,columna,text, text[contador]))
-        elif re.search(r"[\"]",text[contador]):
-            listaTokens.append(StateCadena(linea,columna,text, text[contador]))
+        elif re.search(r"[\/]",text[contador]) and text[contador+1]=="*":
+            listaTokens.append(CommentsMultiline(linea, columna, text, text[contador]))
         elif re.search(r"[\n]", text[contador]):#SALTO DE LINEA
             contador += 1
             linea += 1
             columna = 1 
             texto= texto+"\n"
+        elif re.search(r"[\-a-zA-Z]",text[contador]):
+            listaTokens.append(StateIdentifier(linea, columna, text, text[contador]))
+        elif re.search(r"[0-9]",text[contador]):
+            listaTokens.append(StateNumber(linea,columna,text, text[contador]))
+        elif re.search(r"[\"]",text[contador]):
+            listaTokens.append(StateCadena(linea,columna,text, text[contador]))
         elif re.search(r"[ ]", text[contador]):#ESPACIOS Y TABULACIONES
             contador += 1
             columna += 1
@@ -79,6 +78,7 @@ def StateIdentifier(line,column,text,word):
         texto= texto+""+word
         return[line, column,'IDENTIFICADOR',word]
 
+
 def StateNumber(line, column, text, word):
     global contador, columna, texto
     contador += 1
@@ -112,83 +112,6 @@ def StateDecimal(line, column, text, word):
         texto= texto+""+word
         return [line, column, 'DECIMAL', word]
 
-def Comments(line,column, text, word):
-    global contador, columna, texto
-    contador+=1
-    columna+=1
-    if contador < len(text):
-        if re.search(r"[\*]",text[contador]):
-            return Comments(line, column, text, word+ text[contador])
-        elif re.search(r"[a-zA-Z0-9áéíñóúüÁÉÍÑÓÚÜ\t\b\&\%\$\#\"\!\(\)\=\'\?\¿\¡\-\<\>\_\|\°\¬\{\.\,\~\+\;\:\¨\`\^\@\[\]]",text[contador],re.UNICODE):
-            return Comments(line, column, text, word + text[contador])
-        elif re.search(r"[ ]",text[contador]):
-            return Comments(line, column, text, word + text[contador])
-        elif re.search(r"[\/]",text[contador]):
-            texto = texto +""+word+""+text[contador]
-            contador+=1
-            return [line,column, 'COMENTARIO', word +text[contador]]
-        elif re.search(r"[\n]",text[contador]):
-            return CommentsMultiline(linea,columna, text, word +text[contador])
-        else:
-            texto = texto+""+word
-            return [line,column, 'COMENTARIO', word]
-    else:
-        texto= texto+""+word
-        return [line,column,'COMENTARIO', word]
-
-def CommentsMultiline(line, column, text, word):
-    global contador, columna, texto
-    contador+=1
-    columna+=1
-    if contador < len(text):
-        if re.search(r"[\/]", text[contador]):
-            texto = texto +""+word+""+text[contador]
-            contador+=1
-            return [line, column, 'COMENTARIO MULTILINEA',word+ text[contador-1]]
-        elif re.search(r"[a-zA-Z0-9áéíñóúüÁÉÍÑÓÚÜ\t\b\&\%\$\#\"\!\(\)\=\'\?\¿\¡\-\<\>\_\|\°\¬\{\.\,\~\+\;\:\¨\`\^\@\[\]]",text[contador]):
-            return CommentsMultiline(line, column, text, word+ text[contador])
-        elif re.search(r"[ ]",text[contador]):
-            return CommentsMultiline(line, column, text, word + text[contador])
-        elif re.search(r"[\*]",text[contador]):
-            return CommentsMultiline(line, column, text, word+ text[contador])
-        elif re.search(r"[\n]",text[contador]):
-            return CommentsMultiline(line, column, text, word+ text[contador])
-        else:
-            texto = texto+""+word
-            return [line, column, 'COMENTARIO MULTILINEA',word]
-    else:
-            texto = texto+""+word
-            return [line, column, 'COMENTARIO MULTILINEA',word]
-
-
-def EstadoPath(line, column, text, word):
-    global contador, columna, texto,path
-    contador+=1
-    columna += 1
-    if contador < len(text):
-        if word=="//" or word.find("//")!=-1:
-            if re.search(r"[ A-Z\:A-Z\:\\A-Za-z]",text[contador]):
-                return EstadoPath(line, column, text, word + text[contador])
-            elif re.search(r"[\/]",text[contador]):
-                return EstadoPath(line, column, text, word+text[contador])
-            elif re.search(r"[\n]", text[contador]):
-                pathw="PATHW:"
-                if re.search(pathw, word):
-                    texto = texto+""+word
-                    path=word
-                    return[line, column, "PATHW",word]
-                else:
-                  texto = texto+""+word
-                  return[line,column,'COMENTARIO',word]
-            else: 
-                texto = texto+""+word
-                path=word
-                return[line,column,'PATHW',word]
-        elif re.search(r"[\/]", text[contador]):
-            return EstadoPath(line, column, text, word+text[contador])
-        else:
-            texto = texto+""+word
-            return [line, column,'DIAGONAL_INVERTIDA',word]
 
 def StateCadena(line, column, text, word):
     global contador,columna, texto
@@ -205,7 +128,69 @@ def StateCadena(line, column, text, word):
     else:
         texto = texto+""+word
         return [line,column,'CADENA',word]
-    
+
+
+def EstadoPath(line, column, text, word):
+    global contador, columna, texto,path
+    contador+=1
+    columna += 1
+    if contador < len(text):
+        if word=="//" or word.find("//")!=-1:
+            if re.search(r"[ A-Z\:A-Z\:\\A-Za-z]",text[contador]):
+                return EstadoPath(line, column, text, word + text[contador])
+            elif re. search(r"[a-zA-Z0-9áéíñóúüÁÉÍÑÓÚÜ\t\b\&\%\$\#\"\!\(\)\=\'\?\¿\¡\-\<\>\_\|\°\¬\{\.\,\~\+\;\:\¨\`\^\@\[\]\/]",text[contador],re.UNICODE):
+                return EstadoPath(line, column, text, word+ text[contador])
+            elif re.search(r"[ ]",text[contador]):
+                return EstadoPath(line, column, text, word +text[contador])
+            elif re.search(r"[\n]", text[contador]):
+                pathw="PATHW:"
+                if re.search(pathw, word):
+                    texto = texto+""+word
+                    path=word
+                    return[line, column, "PATHW",word]
+                else:
+                  texto = texto+""+word
+                  return[line,column,'COMENTARIO',word]  
+            elif re.match("PATHW",word):
+                texto = texto+""+word
+                path=word
+                return[line, column, "PATHW",word]
+            else: 
+                texto = texto+""+word
+                return[line,column,'COMENTARIO',word]
+        elif re.search(r"[\/]", text[contador]):
+            return EstadoPath(line, column, text, word+text[contador])
+        else:
+            texto = texto+""+word
+            return [line, column,'DIAGONAL_INVERTIDA',word]
+
+def CommentsMultiline(line, column, text, word):
+    global contador, columna, texto
+    contador+=1
+    columna+=1
+    if contador < len(text):
+        if re.search(r"[\/]", text[contador]) and text[contador-1]=="*":
+            texto = texto +""+word+""+text[contador]
+            contador+=1
+            return [line, column, 'COMENTARIO MULTILINEA',word+ text[contador-1]]
+        elif re.search(r"[a-zA-Z0-9áéíñóúüÁÉÍÑÓÚÜ\t\b\&\%\$\#\"\!\(\)\=\'\?\¿\¡\-\<\>\_\|\°\¬\{\.\,\~\+\;\:\¨\`\^\@\[\]\/]",text[contador]):
+            return CommentsMultiline(line, column, text, word+ text[contador])
+        elif re.search(r"[\\]",text[contador]) and text[contador-1] !="*":
+            return CommentsMultiline(line, column, text, word+text[contador])
+        elif re.search(r"[ ]",text[contador]):
+            return CommentsMultiline(line, column, text, word + text[contador])
+        elif re.search(r"[\*]",text[contador]):
+            return CommentsMultiline(line, column, text, word+ text[contador])
+        elif re.search(r"[\n]",text[contador]):
+            return CommentsMultiline(line, column, text, word+ text[contador])
+        else:
+            texto = texto+""+word
+            return [line, column, 'COMENTARIO MULTILINEA',word]
+    else:
+            texto = texto+""+word
+            return [line, column, 'COMENTARIO MULTILINEA',word]
+
+
 def Reserved(TokenList):
     global texto
     for token in TokenList:
@@ -218,11 +203,11 @@ def Reserved(TokenList):
 
 def GeneraReporte(direccion):
 
-    nombre=direccion+"\\"+"ErroresCSS.html"
+    nombre=direccion+"\\"+"ErroresJS.html"
     archivo = open(nombre,"w+")
     archivo.write("<!DOCTYPE HTML5>\n<html>\n<head>\n<title>TABLA DE ERRORES</title>\n</head>\n<body>\n")
     archivo.write("\n<table border=\"1\">")
-    archivo.write("\n<caption>REPORTE DE ERRORES CSS</caption>\n<tr align=\"center\" bottom=\"middle\">\n<th>Linea</th>\n<th>Columna\n<th>Caracter</th></tr>\n")
+    archivo.write("\n<caption>REPORTE DE ERRORES JS</caption>\n<tr align=\"center\" bottom=\"middle\">\n<th>Linea</th>\n<th>Columna\n<th>Caracter</th></tr>\n")
     for error in Errores:
         archivo.write("<tr>")
         archivo.write("<td>")
@@ -232,6 +217,8 @@ def GeneraReporte(direccion):
     archivo.write("</table>\n</body>\n</html>")
     archivo.close()
     os.system(nombre)
+
+
 
 def inicio(datos):
     global TextoError,texto,path
