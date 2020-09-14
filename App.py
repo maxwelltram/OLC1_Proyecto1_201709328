@@ -1,14 +1,18 @@
-from tkinter import *   
+from tkinter import *  
+import sys
+import os
 from tkinter import messagebox as MessageBox
 import tkinter as tk
 import AnalizadorHTML as anaHtml
 import AnalizadorCSS as anaCss
 import AnalizadorJSS as anaJss
+import AnalizadorSintactico as anaSinta
 from tkinter.font import Font
 from tkinter.filedialog import askopenfilename
 from tkinter import simpledialog
 root = tk.Tk()
-
+extension=[]
+global ext
 Analiza=""  
 #PROBANDO LOS CONTADORES DE LINEAS*************************************************
 class TextLineNumbers(tk.Canvas):
@@ -126,7 +130,7 @@ class Example(tk.Frame):
         self.menuArchivo=tk.Menu(self.barraMenu)
         self.menuAcciones=tk.Menu(self.barraMenu)
         #CASACADA ARCHIVO
-        self.menuArchivo.add_command(label="Nuevo")
+        self.menuArchivo.add_command(label="Nuevo",command=self.Nuevo)
         self.menuArchivo.add_command(label="Abrir",command=self.Abrir)
         #CASACADA ACCIONES
         self.menuAcciones.add_command(label="Guardar",command=self.Guardar)
@@ -162,24 +166,31 @@ class Example(tk.Frame):
         root.config(menu=self.barraMenu)
 
     def Abrir(self):
+        global ext
         Tk().withdraw()
-        filename = askopenfilename(filetypes=[("Html file","*.html"),("JavaScript file","*.js"),("Css file","*.css")])
+        filename = askopenfilename(filetypes=[("Html file","*.html"),("JavaScript file","*.js"),("Css file","*.css"),("Rmt file","*.rmt")])
         fichero = open(filename,"r", encoding='utf-8')
         print(filename)
         
+        extension = filename.split(".")
+
+        ext = extension[1]
         contenido = fichero.read()
         self.text.delete(1.0,"end")
         self.text.insert("insert",contenido)
         fichero.close()
-    def obten(self):    
+    def obten(self): 
+        global ext   
         input = self.text.get("1.0","end-1c")
         print(input)
-
-        ##Errores, TextoLimpio = anaJss.inicio(input)
-
-        Errores, TextoLimpio = anaCss.inicio(input)
-
-        ##Errores, TextoLimpio = anaHtml.inicio(input)
+        if ext =="html":
+            Errores, TextoLimpio = anaHtml.inicio(input)
+        elif ext== "css":
+            Errores, TextoLimpio = anaCss.inicio(input)
+        elif ext== "js":
+            Errores, TextoLimpio = anaJss.inicio(input)
+        else:
+            Errores, TextoLimpio =anaSinta.inicio(input)
         
         if Errores!="" and TextoLimpio!="":
             MessageBox.showinfo("ANALISIS EXITOSO","SE ACTUALIZO EL ARCHIVO Y SE MUESTRAN LOS ERRORES")
@@ -195,7 +206,9 @@ class Example(tk.Frame):
         else:
             MessageBox.showinfo("ANALISIS FALLIDO","NO SE PUDO REALIZAR EL ANALISIS")
         
-        
+    def Nuevo(self):
+        self.text.delete(1.0,"end")
+
     def GuardarComo(self):
         nombre = simpledialog.askstring("Guardar Como", "Escriba el nombre del archivo con su extension",
                                 parent=root)
