@@ -9,5 +9,15 @@ herramienta o extensión para realizar el analisis y también se agregan funcion
 
 Se adjuntan archivos de prueba para cada uno de los analizadores con nombres:
 * pruebita.html
+* tests - Copy.html
+* ejemplo.js
+* ejemplo.css
+* test.rmt
+* Operaciones.rmt
+* easy.rmt
+* malos.rmt
+De la misma forma se encuentran añadidos los manuales:
+* Usuario
+* Tecnico
 
-- Creado por: Maxwellt Ramírez - 201709328
+Creado por: Maxwellt Ramírez - 201709328
