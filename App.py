@@ -135,7 +135,6 @@ class Example(tk.Frame):
         #CASACADA ACCIONES
         self.menuAcciones.add_command(label="Guardar",command=self.Guardar)
         self.menuAcciones.add_command(label="Guardar Como",command=self.GuardarComo)
-        self.menuAcciones.add_command(label="Ejecutar Analisis")
         self.menuAcciones.add_separator()
         self.menuAcciones.add_command(label="Salir",command=root.destroy)
         #AGREGANDO A LA VENTANA

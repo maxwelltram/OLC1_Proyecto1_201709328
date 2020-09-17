@@ -25,6 +25,8 @@ def inic(text):
             listaTokens.append(StateIdentifier(linea, columna, text, text[contador]))
         elif re.search(r"[0-9]", text[contador]): #NUMERO
             listaTokens.append(StateNumber(linea, columna, text, text[contador]))
+        elif re.search(r"[\<]",text[contador]) and text[contador+1]=="!":
+            listaTokens.append(EstadoComentario(linea, columna, text, text[contador]))
         elif re.search(r"[\n]", text[contador]):#SALTO DE LINEA
             contador += 1
             linea += 1
@@ -95,6 +97,20 @@ def StateNumber(line, column, text, word):
         texto= texto+""+word
         return [line, column, 'integer', word]
 
+def EstadoComentario(line, column, text, word):
+    global contador, columna, texto
+    contador +=1
+    columna+=1
+    if contador< len(text):
+        if re.search(r"[\!\- a-zA-Z\>]",text[contador]):
+            return EstadoComentario(line, column, text, word+text[contador])
+        else:
+            texto=texto+""+word
+            return[line, column, 'COMENTARIO', word]
+    else: 
+        texto=texto+""+word
+        return[line, column, 'COMENTARIO',word]
+
 def StateDecimal(line, column, text, word):
     global contador, columna, texto
     contador += 1
@@ -133,10 +149,26 @@ def EstadoPath(line, column, text, word):
         if word=="//" or word.find("//")!=-1:
             if re.search(r"[ A-Z\:A-Z\:\\A-Za-z]",text[contador]):
                 return EstadoPath(line, column, text, word + text[contador])
-            else: 
-                texto = texto+""+word
-                path=word
-                return[line,column,'PATHW',word]
+            elif re.search(r"[\n]", text[contador]):
+                pathw="PATHW:"
+                if re.search(pathw, word):
+                    texto = texto+""+word
+                    path=word
+                    return[line, column, "PATHW",word]
+                else:
+                  texto = texto+""+word
+                  return[line,column,'COMENTARIO',word]
+            elif re.search(r"[\/]",text[contador]):
+                return EstadoPath(line, column, text, word+text[contador])
+            else:
+                pathw="PATHW:"
+                if re.search(pathw, word):
+                    texto = texto+""+word
+                    path=word
+                    return[line,column,'PATHW',word]
+                else:
+                    texto = texto+""+word
+                    return[line,column,'COMENTARIO',word]
         elif re.search(r"[\/]", text[contador]):
             return EstadoPath(line, column, text, word+text[contador])
         else:
@@ -180,8 +212,12 @@ def inicio(datos):
     print(ruta)
     auxruta =ruta[1]
     print(auxruta)
-    pathRuta= auxruta.split(" ")
-    if pathRuta[1]!=" ":
+    try:
+        pathRuta= auxruta.split(" ")
+    except ValueError:
+        print("ERROOOOOOR")
+
+    if  len(pathRuta)==2 and pathRuta[1]!=" ":
         print("DIRECCION:"+pathRuta[1]+"ES ESTA")
         os.makedirs(pathRuta[1],exist_ok=True)
         GeneraReporte(pathRuta[1])

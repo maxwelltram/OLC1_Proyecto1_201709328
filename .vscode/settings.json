@@ -1,0 +1,5 @@
+{
+    "python.autoComplete.extraPaths": [
+    ],
+    "python.sortImports.path": "C:\\Program Files\\Graphviz 2.44.1\\bin"
+}

@@ -245,7 +245,7 @@ def inicio(datos):
     auxruta =ruta[1]
     print(auxruta)
     pathRuta= auxruta.split(" ")
-    if pathRuta[1]!=" ":
+    if len(pathRuta)==2 and pathRuta[1]!=" ":
         print("DIRECCION:"+pathRuta[1]+"ES ESTA")
         os.makedirs(pathRuta[1],exist_ok=True)
         GeneraReporte(pathRuta[1])

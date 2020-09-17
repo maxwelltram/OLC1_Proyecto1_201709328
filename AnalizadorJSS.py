@@ -1,5 +1,4 @@
 import re,os
-
 linea =0
 columna=0
 contador=0
@@ -218,6 +217,30 @@ def GeneraReporte(direccion):
     archivo.close()
     os.system(nombre)
 
+def GenerarReporteDot(direccion):
+    nombre=direccion+"\\"+"Grafos.txt"
+    dot="Grafos.txt"
+    salida="Grafos.png"
+    nombreaux= direccion+"\\"+"Grafos"
+    archivo = open(nombre,"w+")
+    archivo.write("digraph Automatas {\n")
+    archivo.write("rankdir=LR\n"+"size=\"8.5\"\n"+"node [shape = doublecircle]; S0 S2 C4 N2 ND3 I2 CA4;\n"+"node [shape = circle];\n")
+    archivo.write("S0 -> S1 [ label = \"/\" ];\nS1 -> S1 [ label =\"/\"] \nS1 -> S1 [ label =\"L\"]\nS1 -> S1 [ label =\"SIGNO\"]"+
+    "S1 -> S1 [ label =\"METACARACTER\"]\n S1 -> S2 [ label =\"/n\"]\n")
+    archivo.write("C0 -> C1 [ label = \"/\" ];\nC1 -> C2 [ label =\"/\"]\nC2 -> C3 [ label =\"L\"]\nC3 -> C3 [ label =\"L\"]\n"+
+    "C3 -> C3 [ label =\"SIGNO\"]\nC3 -> C3 [ label =\"METACARACTER\"]\nC3 -> C4 [ label =\"/\"]\n")
+    archivo.write("N0 -> N1 [ label = \"NUMERO\" ];\nN1 -> N1 [ label =\"NUMERO\"]\nN1 -> N2 [ label =\"ENTER O DIFERENTE DE NUMERO\"]\n")
+    archivo.write("ND0 -> ND1 [ label = \"NUMERO\" ];\nND1 -> ND2 [ label =\"PUNTO\"]\nND2 -> ND2 [ label =\"NUMERO\"]\nND2 -> ND3 [ label =\"DIFERENTE DE NUMERO\"]\n")
+    archivo.write("I0 -> I1 [ label = \"L\" ];\nI1 -> I1 [ label =\"L\"]\nI1 -> I1 [ label =\"NUMERO\"]\nI1 -> I2 [ label =\"ENTER O DIFERENTE DE L Y NUMERO\"]\n")
+    archivo.write("CA0 -> CA1 [ label = \"\\\"\" ];\nCA1 -> CA3 [ label =\"L\"]\nCA3 -> CA3 [ label =\"L\"]\nCA3 -> CA3 [ label = \"SIGNO\"]\n"+
+    "CA3 -> CA3 [ label =\"METACARACTER\"]\nCA3 -> CA4 [ label =\"\\\"\"]\n")
+    archivo.write("}")
+    archivo.close()
+    comando = "dot  -Tpng "+nombre+" -o "+nombreaux+".png"
+    print(comando)
+    print(os.system(comando))
+    nombreaux=direccion+"\\"+"Grafos.png"
+    os.system(nombreaux)
 
 
 def inicio(datos):
@@ -232,10 +255,11 @@ def inicio(datos):
     auxruta =ruta[1]
     print(auxruta)
     pathRuta= auxruta.split(" ")
-    if pathRuta[1]!=" ":
+    if len(pathRuta)==2 and pathRuta[1]!=" ":
         print("DIRECCION:"+pathRuta[1]+"ES ESTA")
         os.makedirs(pathRuta[1],exist_ok=True)
         GeneraReporte(pathRuta[1])
+        GenerarReporteDot(pathRuta[1])
     else:
         print("DIRECCION:"+auxruta+"ES ESTA")
         os.makedirs(auxruta,exist_ok=True)
